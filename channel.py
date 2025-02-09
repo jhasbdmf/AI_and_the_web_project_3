@@ -12,13 +12,17 @@ from openai import OpenAI
 def generate_chat_message(prompt, chat_instance, model):
     chat_completion = chat_instance.chat.completions.create(
         messages = [
-            {"role":"system","content" : "You are an analytic philosopher. Be as precise and concise as possible. Evaluate the following stetement: "},
+            {"role":"system","content" : "You are an analytic philosopher. Be as precise and concise as possible. Evaluate the following user stetement: "},
             {"role":"user","content" : prompt}
         ],
         model = model,
     )
     return chat_completion.choices[0].message.content
 
+def save_messages(messages):
+    global CHANNEL_FILE
+    with open(CHANNEL_FILE, 'w') as f:
+        json.dump(messages, f)
 
 # Class-based application configuration
 class ConfigClass(object):
@@ -51,6 +55,16 @@ client = OpenAI(
      api_key = API_KEY,
      base_url = BASE_URL
 )
+
+initial_message = [
+    {'content': "This is an Ancient philosophy chat. Be polite and do not mention two putatively great continental philosophers whose names start with H.",
+    'sender': "System",
+    'timestamp': "",
+    'extra': "",
+    }
+]
+
+save_messages(initial_message)
 
 @app.cli.command('register')
 def register_command():
@@ -132,8 +146,6 @@ def send_message():
     
     messages = read_messages()
 
-    #if the upper bound on the number of messages is achieved,
-    #delete the oldest message
    
        
 
@@ -156,6 +168,10 @@ def send_message():
                      'extra': extra,
                      })
     
+    #delete old messages
+    #until total number thereof
+    #obeys the upper bound on the total
+    #number of messages
     while len(messages) > MAX_MESSAGE_NUMBER:
         messages.pop(0)
     save_messages(messages)
@@ -174,10 +190,7 @@ def read_messages():
     f.close()
     return messages
 
-def save_messages(messages):
-    global CHANNEL_FILE
-    with open(CHANNEL_FILE, 'w') as f:
-        json.dump(messages, f)
+
 
 # Start development web server
 # run flask --app channel.py register
