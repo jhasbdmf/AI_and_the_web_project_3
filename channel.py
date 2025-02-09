@@ -56,15 +56,36 @@ client = OpenAI(
      base_url = BASE_URL
 )
 
-initial_message = [
+initial_messages = []
+initial_messages.append(
     {'content': "This is an Ancient philosophy chat. Be polite and do not mention two putatively great continental philosophers whose names start with H.",
     'sender': "System",
     'timestamp': "",
     'extra': "",
-    }
-]
+    })
 
-save_messages(initial_message)
+initial_messages.append(
+    {'content': "Just acts are allotrion agathon i.e. foreign good. He who acts most justly is he who is the dumbest.",
+    'sender': "Thrasymachos",
+    'timestamp': "",
+    'extra': "",
+    })
+
+initial_messages.append(
+    {'content': "In an ideal polity, he who acts justly acts in accordance with the expectations to his social role und thus contributes to the maintenance of that ideal polity. Living in such a polity is good for all its citizens. So just acts are both foreign and one's own good.",
+    'sender': "Socrates",
+    'timestamp': "",
+    'extra': "",
+    })
+
+
+ 
+
+
+
+
+
+save_messages(initial_messages)
 
 @app.cli.command('register')
 def register_command():
