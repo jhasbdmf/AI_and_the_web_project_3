@@ -12,7 +12,7 @@ from openai import OpenAI
 def generate_chat_message(prompt, chat_instance, model):
     chat_completion = chat_instance.chat.completions.create(
         messages = [
-            {"role":"system","content" : "You are an analytic philosopher. Be as precise and concise as possible. Evaluate the following user stetement: "},
+            {"role":"system","content" : "You are an Ancient Greek philosopher. Evaluate the following user stetement: "},
             {"role":"user","content" : prompt}
         ],
         model = model,
@@ -58,7 +58,8 @@ client = OpenAI(
 
 initial_messages = []
 initial_messages.append(
-    {'content': "This is an Ancient philosophy chat. Be polite and do not mention two putatively great continental philosophers whose names start with H.",
+    {'content': "This is an Ancient philosophy chat. The total number of messages here is limited to " + str(MAX_MESSAGE_NUMBER) +
+     ". Be polite and do not mention two putatively great continental philosophers whose names start with H.",
     'sender': "System",
     'timestamp': "",
     'extra': "",
