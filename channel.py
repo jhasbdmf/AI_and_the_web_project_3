@@ -36,19 +36,14 @@ app = Flask(__name__)
 app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
 
-#HUB_URL = 'http://localhost:5555'
-#HUB_AUTHKEY = '1234567890'
-
-HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
-HUB_AUTHKEY = 'Crr-K24d-2N'
-
+HUB_URL = 'http://localhost:5555'
+HUB_AUTHKEY = '1234567890'
 CHANNEL_AUTHKEY = '0987654321'
 CHANNEL_NAME = "philosophy chat"
-#CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
-CHANNEL_ENDPOINT = "http://vm146.rz.uni-osnabrueck.de/hub/ancient_philosophy_chat"
+CHANNEL_ENDPOINT = "http://localhost:5001" # don't forget to adjust in the bottom of the file
 CHANNEL_FILE = 'messages.json'
-CHANNEL_TYPE_OF_SERVICE = 'aiweb24:ancient_philosophy_chat'
-MAX_MESSAGE_NUMBER = 11
+CHANNEL_TYPE_OF_SERVICE = 'aiweb24:philosophy_chat'
+MAX_MESSAGE_NUMBER = 10
 
 # Openai/llama API configuration
 API_KEY = 'becc06335fb9111827b944a3a90546d6' # Replace with your API key
@@ -80,9 +75,7 @@ def register_command():
         print(response.text)
         return
     else:
-        #if channel is registered successfully
-        #save initial messages to be displayed by default
-        #into the CHANNEL_FILE 
+      
         initial_messages = []
 
         initial_messages.append(
@@ -153,7 +146,7 @@ def send_message():
 
     #lower bound on the number of words in a message
     if len(message_tokens) <= 5:
-        return "I appreciate your laconic way of thought expression. We are however in Attica, so please be more elaborate i.e use more than 5 words in what you post.", 400
+        return "I appreciate your laconic way of though expression. We are however in Attica, so please be more elaborate i.e use more than 5 words in what you post.", 400
     #upper bound on the number of words in a message
     if len(message_tokens) >= 100:
         return "Although we are in Attica, try to be more laconic i.e. use fewer than 100 words in your message.", 400
@@ -197,10 +190,8 @@ def send_message():
     #until total number thereof
     #obeys the upper bound on the total
     #number of messages
-    #the first system message with chat rules
-    #should be protected from erasing
     while len(messages) > MAX_MESSAGE_NUMBER:
-        messages.pop(1)
+        messages.pop(0)
     save_messages(messages)
     return "OK", 200
 
