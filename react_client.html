@@ -33,7 +33,7 @@
                     <ul>
                         {channels.map(channel => (
                             <li key={channel.id}>
-                                {channel.name} (URL: {channel.endpoint}, Type: {channel.type_of_service})
+                                <a href = {channel.endpoint}>{channel.name} (Type: {channel.type_of_service})</a>
                             </li>
                         ))}
                     </ul>
