@@ -14,6 +14,8 @@
 
     <script type="text/babel">
 
+      
+
         function ChannelList() {
             // React component that shows a channel list
             // content is fetched from the university hub (works only on university network, use VPN)
@@ -32,8 +34,8 @@
                     <h2>Channel List</h2>
                     <ul>
                         {channels.map(channel => (
-                            <li key={channel.id}>
-                                <a href = {channel.endpoint}>{channel.name} (Type: {channel.type_of_service})</a>
+                            <li key={channel.id} onClick = {() => display_channel(channel)}>
+                                {channel.name} (Type: {channel.type_of_service})
                             </li>
                         ))}
                     </ul>
@@ -41,11 +43,87 @@
             );
         }
 
+        function display_channel(channel){
+
+            let messages;
+
+            fetch('http://vm146.rz.uni-osnabrueck.de/u083/messages.json')
+            .then(response => {
+                if (!response.ok) {
+                throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                messages = data;
+                messages.map(item => console.log(item["content"]));
+               
+            })
+            .catch(error => {
+                console.error('Error fetching JSON:', error);
+            });
+
+            return <p>messages[0]</p>
+
+                    
+        }   
+
+   
+
+        function Counter() {
+            const CHANNEL_AUTHKEY = '0987654321'
+            const [count, setCount] = React.useState(0);
+            const [messages, setMessages] = React.useState([]);
+
+            React.useEffect(() => {
+                
+                fetch("http://vm146.rz.uni-osnabrueck.de/u083/channel.wsgi/", {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'authkey ' + CHANNEL_AUTHKEY
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        setMessages(data);
+                      
+                    })
+                    .catch(error => {
+                        console.error('Error fetching JSON:', error);
+                    });
+            }, []);
+
+            return (
+                <div>
+                    <p>Count: {count}</p>
+                    <button onClick={() => setCount(count + 1)}>Increment</button>
+                    <h2>Messages:</h2>
+                    <ul>
+                        {messages.map((message, index) => (
+                            <li key={index}>{message.content}</li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        }
+
+
+   
+
         // main code: render the ChannelList component, add more components here
         ReactDOM.render(
             <div>
                 <h1>Chat client: List of channels</h1>
                 <ChannelList />
+                
+                <Counter />
+      
+         
 
             </div>,
             document.getElementById('root'));
