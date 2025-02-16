@@ -27,20 +27,21 @@
 
             const handleClick = (channel) => {
                
-                alert(`You clicked on ${channel.name}`);
+                
                 setSelectedChannel(channel);
                 console.log(selectedChannel.endpoint)
+                alert(`You clicked on ${selectedChannel.endpoint}`);
             };
 
             React.useEffect(() => {
                 if (selectedChannel) {
                 
-                    //fetch("http://vm146.rz.uni-osnabrueck.de/u070/channel.wsgi/", {
+                
                     
                     fetch(selectedChannel.endpoint, {
                         method: 'GET',
                         headers: {
-                            'Authorization': 'authkey ' + CHANNEL_AUTHKEY
+                            'Authorization': 'authkey ' + selectedChannel.authkey
                         }
                     })
                         .then(response => {
@@ -69,20 +70,25 @@
 
             return (
                 <div>
-                    <h2>Channel List</h2>
-                    <ul>
-                        {channels.map(channel => (
-                            <li key={channel.id} onClick={() => handleClick(channel)}>
-                                {channel.name} (Type: {channel.type_of_service})
-                            </li>
-                       
-                        ))}
-                    </ul>
-                    <ul>
-                        {messages.map((message, index) => (
-                            <li key={index}>{message.content}</li>
-                        ))}
-                    </ul>
+                    <div style={{ display: 'inline-block', width: '30%', verticalAlign: 'top' }}>
+                        <h2>Channel List</h2>
+                        <ul>
+                            {channels.map(channel => (
+                                <li key={channel.id} onClick={() => handleClick(channel)}>
+                                    {channel.name} (Type: {channel.type_of_service})
+                                </li>
+                        
+                            ))}
+                        </ul>
+                    </div>
+                    <div style={{ display: 'inline-block', width: '70%', verticalAlign: 'top' }}>
+                        <h2>Messages</h2>
+                        <ul>
+                            {messages.map((message, index) => (
+                                <li key={index}>{message.content}</li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             );
         }
