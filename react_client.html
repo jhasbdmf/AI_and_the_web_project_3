@@ -36,8 +36,50 @@
                 console.log(selectedChannel.endpoint)
                 
             };
+            const handleSubmit = async (event) => {
+                event.preventDefault(); // Prevent default form submission
+                try {
+                    if (!selectedChannel) {
+                        throw new Error('No channel selected');
+                    }
 
-            const handleSubmit = async () => {
+                    const response = await fetch(selectedChannel.endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'authkey ' + selectedChannel.authkey,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            content: messageContent,
+                            sender: messageSender,
+                            timestamp: "2025"
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    setMessageContent('');
+                    setMessageSender('');
+                    
+                    // Fetch updated messages
+                    const updatedMessages = await fetch(selectedChannel.endpoint, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'authkey ' + selectedChannel.authkey
+                        }
+                    }).then(res => res.json());
+
+                    setMessages(updatedMessages);
+
+                } catch (error) {
+                    console.error('Error posting message:', error);
+                }
+            };
+
+
+            const handleSubmit1 = async () => {
                 try {
                
                     const response = await fetch(selectedChannel.endpoint, {
@@ -60,8 +102,11 @@
                 
                  
                     setMessageContent('');
+                    setMessageSender('');
+
+                    
              
-                    handleClick(selectedChannel);
+          
                     const data = await response.json();
                     return data;
 
@@ -127,12 +172,12 @@
                             ))}
                         </ul>
                         {selectedChannel && (
-                            <form onSubmit={handleSubmit()}>
+                            <form onSubmit={handleSubmit}>
                                 <input 
                                     type="text" 
                                     placeholder="Enter your username" 
                                     value={messageSender}
-                                    onChange={(d) => setMessageSender(d.target.value)}
+                                    onChange={(e) => setMessageSender(e.target.value)}
                                 />
                                 <input 
                                     type="text" 
