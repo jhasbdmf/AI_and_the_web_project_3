@@ -22,7 +22,11 @@
             //
             const CHANNEL_AUTHKEY = '0987654321'
             const [channels, setChannels] = React.useState([]);
+            //messages to fetch from the selected channel
             const [messages, setMessages] = React.useState([]);
+            //message content to post to the selected channel
+            const [messageContent, setMessageContent] = React.useState('');
+            const [messageSender, setMessageSender] = React.useState('');
             const [selectedChannel, setSelectedChannel] = React.useState(null);
 
             const handleClick = (channel) => {
@@ -30,7 +34,41 @@
                 
                 setSelectedChannel(channel);
                 console.log(selectedChannel.endpoint)
-                alert(`You clicked on ${selectedChannel.endpoint}`);
+                
+            };
+
+            const handleSubmit = async () => {
+                try {
+               
+                    const response = await fetch(selectedChannel.endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'authkey ' + selectedChannel.authkey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: messageContent,
+                        sender: messageSender,
+                        timestamp: "2025"
+                    })
+                    });
+
+                    if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                    }
+
+                
+                 
+                    setMessageContent('');
+             
+                    handleClick(selectedChannel);
+                    const data = await response.json();
+                    return data;
+
+                } catch (error) {
+                    console.error('Error posting message:', error);
+                    throw error;
+                }
             };
 
             React.useEffect(() => {
@@ -88,7 +126,26 @@
                                 <li key={index}>{message.content}</li>
                             ))}
                         </ul>
+                        {selectedChannel && (
+                            <form onSubmit={handleSubmit()}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter your username" 
+                                    value={messageSender}
+                                    onChange={(d) => setMessageSender(d.target.value)}
+                                />
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter your message" 
+                                    value={messageContent}
+                                    onChange={(e) => setMessageContent(e.target.value)}
+                                />
+                                <button type="submit">Submit</button>
+                            </form>
+                        )}
+                    
                     </div>
+                  
                 </div>
             );
         }
