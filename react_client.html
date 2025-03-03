@@ -42,7 +42,7 @@
                     if (!selectedChannel) {
                         throw new Error('No channel selected');
                     }
-
+                    const currentTimestamp = new Date().toISOString();
                     const response = await fetch(selectedChannel.endpoint, {
                         method: 'POST',
                         headers: {
@@ -52,7 +52,7 @@
                         body: JSON.stringify({
                             content: messageContent,
                             sender: messageSender,
-                            timestamp: "2025"
+                            timestamp: currentTimestamp
                         })
                     });
 
@@ -131,7 +131,10 @@
                         <h2>Messages</h2>
                         <ul>
                             {messages.map((message, index) => (
+                                <div>
                                 <li key={index}>{message.content}</li>
+                                <p>{message.timestamp}</p>
+                                </div>
                             ))}
                         </ul>
                         {selectedChannel && (
