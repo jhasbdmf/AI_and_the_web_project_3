@@ -9,6 +9,9 @@ from nltk.tokenize import word_tokenize
 from profanityfilter import ProfanityFilter
 from openai import OpenAI
 
+
+#this method generates a response the prompt as if the responder were an Ancient Freek philosopher
+#a chat instance is created below
 def generate_chat_message(prompt, chat_instance, model):
     chat_completion = chat_instance.chat.completions.create(
         messages = [
@@ -68,7 +71,7 @@ client = OpenAI(
 def register_command():
     global CHANNEL_AUTHKEY, CHANNEL_NAME, CHANNEL_ENDPOINT
 
-    # send a POST request to server /channels
+    # send a POST request to server /channels with respective auth data
     response = requests.post(HUB_URL + '/channels', headers={'Authorization': 'authkey ' + HUB_AUTHKEY},
                              data=json.dumps({
                                 "name": CHANNEL_NAME,
@@ -76,13 +79,14 @@ def register_command():
                                 "authkey": CHANNEL_AUTHKEY,
                                 "type_of_service": CHANNEL_TYPE_OF_SERVICE,
                              }))
-
+#handle erroneous responses
     if response.status_code != 200:
         print("Error creating channel: "+str(response.status_code))
         print(response.text)
         return
     else:
-      
+#if there is no issues registering a channel
+#make a list of initial messages
         initial_messages = []
 
         initial_messages.append(
@@ -106,7 +110,7 @@ def register_command():
             'timestamp': "2025-02-09T08:30:58.779818",
             'extra': "",
             })
-        
+#and save those initial messages to messages.json via the respective method
         save_messages(initial_messages)
 
 def check_authorization(request):
@@ -149,6 +153,8 @@ def send_message():
     if not 'content' in message:
         return "No content", 400
     
+    #check if a message contains at least between 5 and 100 tokens
+    #shorter and longer messages cannot be posted
     message_tokens = word_tokenize(message["content"])
 
     #lower bound on the number of words in a message
@@ -175,9 +181,10 @@ def send_message():
        
 
     #censor the new message using the profanity filter
+    #surnames of Hegel and Heidegger are to filtered on a par with foul words
     pf = ProfanityFilter(extra_censor_list=["Hegel", "Heidegger"])
     message["content"] = pf.censor(message["content"])
-    # add new message to messages
+    # add new censored message to messages
     messages.append({'content': message['content'],
                      'sender': message['sender'],
                      'timestamp': message['timestamp'],
@@ -197,6 +204,7 @@ def send_message():
     #until total number thereof
     #obeys the upper bound on the total
     #number of messages
+    #the intial system message is not to be deleted
     while len(messages) > MAX_MESSAGE_NUMBER:
         messages.pop(1)
     save_messages(messages)
