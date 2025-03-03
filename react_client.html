@@ -79,43 +79,6 @@
             };
 
 
-            const handleSubmit1 = async () => {
-                try {
-               
-                    const response = await fetch(selectedChannel.endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'authkey ' + selectedChannel.authkey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        content: messageContent,
-                        sender: messageSender,
-                        timestamp: "2025"
-                    })
-                    });
-
-                    if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                    }
-
-                
-                 
-                    setMessageContent('');
-                    setMessageSender('');
-
-                    
-             
-          
-                    const data = await response.json();
-                    return data;
-
-                } catch (error) {
-                    console.error('Error posting message:', error);
-                    throw error;
-                }
-            };
-
             React.useEffect(() => {
                 if (selectedChannel) {
                 
