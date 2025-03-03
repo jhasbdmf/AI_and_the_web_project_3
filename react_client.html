@@ -120,7 +120,13 @@
                         <h2>Channel List</h2>
                         <ul>
                             {channels.map(channel => (
-                                <li key={channel.id} onClick={() => handleClick(channel)}>
+                                <li 
+                                    key={channel.id} 
+                                    onClick={() => handleClick(channel)}
+
+                                    style={{backgroundColor: selectedChannel && selectedChannel === channel ? '#d3d3d3' : 'transparent', }}
+                                
+                                >
                                     {channel.name} (Type: {channel.type_of_service})
                                 </li>
                         
