@@ -55,6 +55,17 @@
                         throw new Error('No channel selected');
                     }
 
+                    // Check if the message content length is 6 to 100 tokens. 
+                    //it does not make sense to send shorter/longer messages to my channel
+                    //as my channel only posts messages with that many tokes
+                    
+                    const tokenCount = messageContent.trim().split(/\s+/).length; // Count tokens (words)
+                    if ((selectedChannel.name == "philosophy chat") && (tokenCount < 6 || tokenCount > 100) ) {
+                        alert('Message length must be 6 up to 100 tokens for the Ancient philosophy channel.'); 
+                        return; // Exit early
+                    }
+
+
                     //if the channel is selected
                     //load current timestamp
                     const currentTimestamp = new Date().toISOString();
