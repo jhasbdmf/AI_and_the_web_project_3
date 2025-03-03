@@ -89,21 +89,21 @@ def register_command():
             {'content': "This is an Ancient philosophy chat. The total number of messages here is limited to " + str(MAX_MESSAGE_NUMBER) +
             ". Be polite and do not mention two putatively great continental philosophers whose names start with H.",
             'sender': "System",
-            'timestamp': "",
+            'timestamp': "2025-02-09T08:26:37.779818",
             'extra': "",
             })
 
         initial_messages.append(
             {'content': "Just acts are allotrion agathon i.e. foreign good. He who acts most justly is he who is the dumbest.",
             'sender': "Thrasymachus",
-            'timestamp': "",
+            'timestamp': "2025-02-09T08:28:58.779818",
             'extra': "",
             })
 
         initial_messages.append(
             {'content': "In an ideal polity, he who acts justly acts in accordance with the expectations to his social role und thus contributes to the maintenance of that ideal polity. Living in such a polity is good for all its citizens. So just acts are both foreign and one's own good.",
             'sender': "Socrates",
-            'timestamp': "",
+            'timestamp': "2025-02-09T08:30:58.779818",
             'extra': "",
             })
         
@@ -198,7 +198,7 @@ def send_message():
     #obeys the upper bound on the total
     #number of messages
     while len(messages) > MAX_MESSAGE_NUMBER:
-        messages.pop(0)
+        messages.pop(1)
     save_messages(messages)
     return "OK", 200
 

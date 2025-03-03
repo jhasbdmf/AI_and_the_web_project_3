@@ -132,7 +132,8 @@
                         <ul>
                             {messages.map((message, index) => (
                                 <div>
-                                <li key={index}>{message.content}</li>
+                                <li key={index}>{message.sender}</li>
+                                <p key={index}>{message.content}</p>
                                 <p>{message.timestamp}</p>
                                 </div>
                             ))}
