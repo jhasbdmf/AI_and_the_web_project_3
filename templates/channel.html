@@ -8,7 +8,7 @@
 <p>The distributed messenger. <a href="{{ url_for('home_page') }}">List of channels.</a> </p>
 {% if channel %}
     <h1> {{ channel.name }}</h1>
-
+    
         {% for message in messages %}
             <h2>{{ message.sender }}</h2>
             <p>{{ message.content }}</p>
