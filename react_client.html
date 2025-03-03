@@ -28,6 +28,7 @@
             const [messageContent, setMessageContent] = React.useState('');
             const [messageSender, setMessageSender] = React.useState('');
             const [selectedChannel, setSelectedChannel] = React.useState(null);
+            const [filterTerm, setFilterTerm] = React.useState('');
 
             const handleClick = (channel) => {
                
@@ -114,12 +115,24 @@
                     .then(data => setChannels(data.channels));
             }, []);  // empty list here means that this effect will run only once (you can add a variable to run it on change)
 
+            // Filter the channels based on the filterTerm
+            const filteredChannels = channels.filter(channel =>
+                    channel.name.toLowerCase().includes(filterTerm.toLowerCase())
+                );
+
             return (
                 <div>
                     <div style={{ display: 'inline-block', width: '30%', verticalAlign: 'top' }}>
                         <h2>Channel List</h2>
+                        <input
+                            type="text"
+                            placeholder="Search channels..."
+                            value={filterTerm}
+                            onChange={(e) => setFilterTerm(e.target.value)} // Update the filterTerm state
+                            style={{ marginBottom: '10px'}} // Some styling
+                        />
                         <ul>
-                            {channels.map(channel => (
+                            {filteredChannels.map(channel => (
                                 <li 
                                     key={channel.id} 
                                     onClick={() => handleClick(channel)}
