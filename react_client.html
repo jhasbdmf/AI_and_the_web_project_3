@@ -21,50 +21,69 @@
             // content is fetched from the university hub (works only on university network, use VPN)
             //
             const CHANNEL_AUTHKEY = '0987654321'
+
+            //list of channels
             const [channels, setChannels] = React.useState([]);
             //messages to fetch from the selected channel
             const [messages, setMessages] = React.useState([]);
             //message content to post to the selected channel
             const [messageContent, setMessageContent] = React.useState('');
+            //message sender name to post to the selected channel
             const [messageSender, setMessageSender] = React.useState('');
+            //the channel currently selected in the client. 
+            //It is this channel whose messages are to be displayed on the left part of the client 
             const [selectedChannel, setSelectedChannel] = React.useState(null);
+            //search/filter term for channel name
+            //the client displays only those channels whose name contain the filter term
             const [filterTerm, setFilterTerm] = React.useState('');
 
+            //it is a method which changes the selected channel name once some channel name is clicked
             const handleClick = (channel) => {
                
-                
                 setSelectedChannel(channel);
                 console.log(selectedChannel.endpoint)
                 
             };
+
+            //this method sends a new message to the selected chat.
             const handleSubmit = async (event) => {
                 event.preventDefault(); // Prevent default form submission
                 try {
+
+                    //check if a channel to post message is selected
                     if (!selectedChannel) {
                         throw new Error('No channel selected');
                     }
+
+                    //if the channel is selected
+                    //load current timestamp
                     const currentTimestamp = new Date().toISOString();
+                    //post a message to the endpoint of the selected channel
                     const response = await fetch(selectedChannel.endpoint, {
                         method: 'POST',
+                        //with the channel authentification data
                         headers: {
                             'Authorization': 'authkey ' + selectedChannel.authkey,
                             'Content-Type': 'application/json'
                         },
+                        //message content, message sender name and current timestampt are to be posted
+                        //message content and sender name are taken from text fields of the message posting form
                         body: JSON.stringify({
                             content: messageContent,
                             sender: messageSender,
                             timestamp: currentTimestamp
                         })
                     });
-
+                    //handle response
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-
+                    //set current message content and sender name to an empty string
                     setMessageContent('');
                     setMessageSender('');
                     
-                    // Fetch updated messages
+                    // Fetch updated messages of the selected channel,
+                    // these messages have to include the recently posted message
                     const updatedMessages = await fetch(selectedChannel.endpoint, {
                         method: 'GET',
                         headers: {
@@ -72,6 +91,8 @@
                         }
                     }).then(res => res.json());
 
+                    //load newly fetched messages of the selected channel to the
+                    //respective variable which stores them
                     setMessages(updatedMessages);
 
                 } catch (error) {
@@ -79,24 +100,28 @@
                 }
             };
 
-
+            //this one fetches messages of the selected channel
             React.useEffect(() => {
+                //if a chennel is selected
                 if (selectedChannel) {
                 
                 
-                    
+                    //make a get request to the endpoint of the selected channel
                     fetch(selectedChannel.endpoint, {
                         method: 'GET',
+                        //with respective authorization data
                         headers: {
                             'Authorization': 'authkey ' + selectedChannel.authkey
                         }
                     })
+                        //handle possible issues
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error('Network response was not ok');
                             }
                             return response.json();
                         })
+                        //store the content of the .json file with the channel messages in the messages variable
                         .then(data => {
                             setMessages(data);
                         })
@@ -107,7 +132,9 @@
             }, [selectedChannel]);
 
 
-
+            //this one fetches the list of channels from the hub
+            //in a similar way in whic the previous method
+            //fetches messages from the selected channel
             React.useEffect(() => {
                 // Fetch list of channels
                 fetch("http://vm146.rz.uos.de/hub/channels") // university hub
@@ -117,26 +144,38 @@
 
             // Filter the channels based on the filterTerm
             const filteredChannels = channels.filter(channel =>
+                    //only those channels are to be stored in the filteredChannels variable
+                    //whose name includes the filter term in a case-insensitive way
                     channel.name.toLowerCase().includes(filterTerm.toLowerCase())
                 );
-
+            //the html-heavy part of the client
             return (
+                //block/div layout is used
+                //there is one large <div> which has two <div>s in it 
+                //those two smaller <div>s are located to the left/right from one another
+                //the left one has 30% width of the parent <div> and contains the list of channels
+                //the right one has 70% width of the parent <div> and contains messages of the selected channel
+
                 <div>
                     <div style={{ display: 'inline-block', width: '30%', verticalAlign: 'top' }}>
                         <h2>Channel List</h2>
+                     {/* it is a textbox to enter the filter term for channel names */}
                         <input
                             type="text"
                             placeholder="Search channels..."
                             value={filterTerm}
                             onChange={(e) => setFilterTerm(e.target.value)} // Update the filterTerm state
-                            style={{ marginBottom: '10px'}} // Some styling
+                            style={{ marginBottom: '10px'}} // add a small margin from the bottom
                         />
+                        {/* this is gonna display the list of channels*/}
                         <ul>
+                            {/* go through the list of filtered channels*/}
                             {filteredChannels.map(channel => (
+                                //add list items which contain channel names
                                 <li 
                                     key={channel.id} 
                                     onClick={() => handleClick(channel)}
-
+                                    //highlight the list item which contains the name of the selected channel
                                     style={{backgroundColor: selectedChannel && selectedChannel === channel ? '#d3d3d3' : 'transparent', }}
                                 
                                 >
@@ -146,10 +185,18 @@
                             ))}
                         </ul>
                     </div>
+                    {/* here we go to the right div with channel messages*/}
                     <div style={{ display: 'inline-block', width: '70%', verticalAlign: 'top' }}>
                         <h2>Messages</h2>
+                        {/* a list to display selected channel messages*/}
                         <ul>
+                            {/* go through the list of messages fetched from a channel endpoint with a get request above*/}
                             {messages.map((message, index) => (
+                                //for each message create a block which contains
+                                //a list item with a message sender name
+                                //and paragraphs with the message content
+                                //and the message timestamp
+                                
                                 <div>
                                 <li key={index}><b>{message.sender}</b></li>
                                 <p key={index}>{message.content}</p>
@@ -157,20 +204,30 @@
                                 </div>
                             ))}
                         </ul>
+                        {/* this forms does post requests to send a message to the selected chat*/}
+                        {/* this form is displayed if and only if a channel has been selected*/}
                         {selectedChannel && (
+                            //the forms has a text field to enter the name of a sender
+
                             <form onSubmit={handleSubmit}>
                                 <input 
                                     type="text" 
                                     placeholder="Enter your username" 
                                     value={messageSender}
+                                    //reset the value of the variable storing the name of the message sender 
+                                    //each time smth new is typed into the text field
                                     onChange={(e) => setMessageSender(e.target.value)}
                                 />
+                            {/* another text fieled to enter the content of a message*/}
                                 <input 
                                     type="text" 
                                     placeholder="Enter your message" 
                                     value={messageContent}
+                                    //reset the value of the variable storing the name of the message sender 
+                                    //each time smth new is typed into the text field
                                     onChange={(e) => setMessageContent(e.target.value)}
                                 />
+                                {/* a button to send a message*/}
                                 <button type="submit">Submit</button>
                             </form>
                         )}
@@ -185,6 +242,7 @@
         ReactDOM.render(
             <div>
                 <h1>Chat client: List of channels</h1>
+                {/* call one large method above which does all the job of the client*/}
                 <ChannelList />
                 
             </div>,
